@@ -29,7 +29,7 @@ origin['discount'] = origin[u'销售价格']/origin[u'吊牌价']   #增加折�
 #origin[u'销售日期'] = pd.to_datetime(origin[u'销售日期'])
 origin[u'销售日期'] = to_datetime(origin[u'销售日期'], format="%Y/%m/%d")
 
-#origin = origin.set_index(u'销售日期')
+origin = origin.set_index(u'销售日期')
 #print(origin['2012-1'])
 
 title_Dict = {}
