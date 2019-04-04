@@ -17,6 +17,7 @@ del df['date']
 values = df.values
 print values
 '''
+统计量化图
 groups = range(1,15)
 i = 1
 plt.figure()
