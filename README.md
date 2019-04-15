@@ -23,3 +23,6 @@
 
 3.predict.csv 为30次预测结果
 
+*****区域单品周销量预测：
+
+1. shanghai-predict.csv 为30次预测结果
