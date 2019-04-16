@@ -3,11 +3,6 @@ from pandas import read_csv
 from pandas import to_datetime
 import pandas as pd
 
-import sys
-
-reload(sys)
-sys.setdefaultencoding('utf8')
-
 def Week(database):
     origin = read_csv(database, encoding='gbk', low_memory=False)
     origin.sort_values(u"销售日期").head()
@@ -15,12 +10,15 @@ def Week(database):
     origin = origin.set_index(u'销售日期')
     # 根据日期排序
     origin = origin[~origin[u'尺码'].isin(['00'])]
-    origin = origin[~origin[u'颜色说明'].str.contains(u'不适用')]  # 去掉颜色说明这一列中含有不适用这一行的数据
-    origin = origin[~origin[u'数量'].isin([-1])]  # 去掉数量为-1的数据
+    # 去掉颜色说明这一列中含有不适用这一行的数据
+    origin = origin[~origin[u'颜色说明'].str.contains(u'不适用')]
+    #origin = origin[~[origin[u'数量'][origin['数量']< 1 ]]] # 去掉数量为-1的数据
+    #origin['discount'][origin['discount'] < 1]
+    origin = origin[origin['数量']> 0 ]
     origin = origin[~origin[u'销售价格'].isin([0])]  # 去掉销售价格为0的数据
     # 去掉尺码为0的数据
 
-    origin = origin.drop([u'店铺省市', u'店铺简称', u'店铺地址', u'颜色编号', u'货号'], axis=1)
+    origin = origin.drop([u'店铺简称', u'店铺地址', u'颜色编号', u'货号'], axis=1)
 
     origin['discount'] = origin[u'销售价格'] / origin[u'吊牌价']  # 增加折扣特征
     # s_M = df_dt.dt.month
@@ -39,61 +37,85 @@ def Week(database):
 
     # 读取上海市牛仔裤的数据
     origin = origin[origin[u'货品名称'].isin([u'牛仔裤'])]
-    # filter = origin[origin[u'店铺省市'].isin([u'上海市上海市市辖区'])]
-    origin = origin[origin[u'店铺编号'].isin(['SH01SH07'])]
+    origin = origin[origin[u'店铺省市'].isin([u'上海市上海市市辖区'])]
+    # 读取单店单品数据
+    #origin = origin[origin[u'店铺编号'].isin(['SH01SH07'])]
+    #print(origin.head(20))
     # 尺码分类
     size = {}
     size.update(dict.fromkeys(['XS', 'S', '24', '25', '26', '27', '28', '29', '30'], 'small'))
     size.update(dict.fromkeys(['M', 'L', '31', '32', '33'], 'medium'))
     size.update(dict.fromkeys(['XL', 'XXL', '34', '36', '38'], 'large'))
     origin[u'尺码'] = origin[u'尺码'].map(size)
+    #print(origin['尺码'])
 
-    # print filter
-    #### 牛仔裤的颜色只统计黑蓝灰白
+    #### 牛仔裤的颜色只统计黑蓝灰
 
     origin['num_grey'] = origin[u'颜色说明']
     origin['num_black'] = origin[u'颜色说明']
     origin['num_blue'] = origin[u'颜色说明']
-    origin['num_black'] = origin[u'颜色说明']
     origin['num_small'] = origin[u'尺码']
     origin['num_medium'] = origin[u'尺码']
     origin['num_large'] = origin[u'尺码']
-    # print origin.head()
+    #print (origin.head(5))
 
     origin['discount'][origin['discount'] < 1] = 0
-    origin.ix[origin['num_large'] == 'large', 'num_large'] = 1
-    origin.ix[origin['num_large'] != 'large', 'num_large'] = 0
 
-    origin.ix[origin['num_small'] == 'small', 'num_small'] = 1
-    origin.ix[origin['num_small'] != 'small', 'num_small'] = 0
+    origin['num_small'].replace('small',1,inplace = True)
+    origin['num_small'].replace('large',int(0),inplace = True)
+    origin['num_small'].replace('medium',int(0),inplace = True)
+    origin['num_small'].replace('NaN',int(0),inplace = True)
+    origin['num_small'] = origin['num_small']*origin['数量']
 
-    origin.ix[origin['num_medium'] != 'medium', 'num_medium'] = 0
-    origin.ix[origin['num_medium'] == 'medium', 'num_medium'] = 1
+    origin['num_medium'].replace('small',0,inplace = True)
+    origin['num_medium'].replace('medium',1,inplace = True)
+    origin['num_medium'].replace('large',0,inplace = True)
+    origin['num_medium'].replace('Nan',0,inplace = True)
+    origin['num_medium'] = origin['num_medium']*origin['数量']
 
-    origin.ix[origin['num_blue'] != 'blue', 'num_blue'] = 0
-    origin.ix[origin['num_blue'] == 'blue', 'num_blue'] = 1
+    origin['num_large'].replace('small',0,inplace = True)
+    origin['num_large'].replace('medium',0,inplace = True)
+    origin['num_large'].replace('large',1,inplace = True)
+    origin['num_large'].replace('NaN',0,inplace = True)
+    origin['num_large'] = origin['num_large']*origin['数量']
 
-    origin.ix[origin['num_grey'] == 'grey', 'num_grey'] = 0
-    origin.ix[origin['num_grey'] != 'grey', 'num_grey'] = 1
+    origin['num_blue'].replace('grey',0,inplace = True)
+    origin['num_blue'].replace('blue',1,inplace = True)
+    origin['num_blue'].replace('black',0,inplace = True)
+    origin['num_blue'].replace('NaN',0,inplace = True)
+    origin['num_blue'] = origin['num_blue']*origin['数量']
 
-    origin.ix[origin['num_black'] != 'black', 'num_black'] = 0
-    origin.ix[origin['num_black'] == 'black', 'num_black'] = 1
+    origin['num_grey'].replace('grey',1,inplace = True)
+    origin['num_grey'].replace('blue',0,inplace = True)
+    origin['num_grey'].replace('black',0,inplace = True)
+    origin['num_grey'].replace('NaN',0,inplace = True)
+    origin['num_grey'] = origin['num_grey']*origin['数量']
 
-    # print origin.head()
+    origin['num_black'].replace('grey',0,inplace = True)
+    origin['num_black'].replace('blue',0,inplace = True)
+    origin['num_black'].replace('black',1,inplace = True)
+    origin['num_black'].replace('NaN',0,inplace = True)
+    origin['num_black'] = origin['num_black']*origin['数量']
 
+    #print (origin.sort_values(u"销售日期"))
+    #print (origin.loc['2012/5/29','数量'])
+
+ #   output = origin['2012/5/29'].resample('w').sum()
     output = origin.resample('w').sum()
-    # print output
+
+    #print (output.head())
 
     output['mean_price'] = origin[u'销售价格'].resample('w').std()
     output['max_price'] = origin[u'销售价格'].resample('w').max()
     output['min_price'] = origin[u'销售价格'].resample('w').min()
     output['rate_dis'] = (output[u'数量'] - output['discount']) / output[u'数量']
+    output['num_othercolor'] = output['数量']-output['num_blue']-output['num_black']-output['num_grey']
 
     output = output.drop([u'吊牌价', u'销售价格'], axis=1)
 
-    output.to_csv('2012-week.csv')
+    output.to_csv('2008-shanghai-week.csv')
 
-Week('2012.csv')
+Week('2008.csv')
 
 #分别得到08-12年的周销量数据后合并到同一个表
 '''
