@@ -41,16 +41,16 @@
 
 3. 统计单品售罄率：
 
-   1) stock_process.py
+   1)stock_process.py
 
       使用'purchase_20190410104706.csv‘统计每个sku的库存，得到‘sku_group.csv’。
       eg: sku1(sku编码),54（该单品库存数量为54个）
 
-   2）sale_process.py
+   2)sale_process.py
 
       使用销量数据统计每个sku在某年（目前统计的为2017年）每周的销量，得到‘sale_sku_group_2017.csv’。
   
-   3）sold_out_rate.py
+   3)sold_out_rate.py
       
       按时间累加某sku的销量，计算该sku占库存的比例，得到'sold_out_rate.csv'
 
