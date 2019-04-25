@@ -32,3 +32,27 @@
 2. shanghai-predict.csv 为30次预测结果
 
 3. shanghai-week-data.py 为生成区域周销量数据。
+
+******品牌单品售罄率特征：
+
+1. 品牌单品售罄率的定义是：在一定时间内（周、月）每个单品（有独一无二的sku编号）售卖的数量占该单品总库存量的比例。
+
+2. 售罄率特征目的：反映某单品是 畅销款 正常款 还是滞销款，提升销量预测的准确度。
+
+3. 统计单品售罄率：
+
+   1) stock_process.py
+
+      使用'purchase_20190410104706.csv‘统计每个sku的库存，得到‘sku_group.csv’。
+      eg: sku1(sku编码),54（该单品库存数量为54个）
+
+   2）sale_process.py
+
+      使用销量数据统计每个sku在某年（目前统计的为2017年）每周的销量，得到‘sale_sku_group_2017.csv’。
+  
+   3）sold_out_rate.py
+      
+      按时间累加某sku的销量，计算该sku占库存的比例，得到'sold_out_rate.csv'
+
+
+
