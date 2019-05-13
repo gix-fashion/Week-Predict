@@ -82,14 +82,14 @@
 “distribution.csv”数据集
 “distribution.py”
 
-1. 数据集特征解释：
+1. 数据集特征解释
 
-    channel_id： 店铺id
-    prop：每个店铺的销量占sku总销量的比例
-    sku_id：sku
-    NextWeek_predict：预测的sku下周销量
-    distribution_sale：sku下周在每个店铺的销量
-    var ：预测值和实际值偏差的方差
+    1）channel_id： 店铺id
+    2）prop：每个店铺的销量占sku总销量的比例
+    3）sku_id：sku
+    4）NextWeek_predict：预测的sku下周销量
+    5）distribution_sale：sku下周在每个店铺的销量
+    6）var ：预测值和实际值偏差的方差
 
 
 2. 算法逻辑
