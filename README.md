@@ -109,7 +109,7 @@
 
 ****************全国各地区单品周销量预测：
 
-china_distribution.py
+china_district/china_distribution.py
 
 1. 算法逻辑
 
